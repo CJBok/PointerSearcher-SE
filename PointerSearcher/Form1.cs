@@ -19,7 +19,8 @@ namespace PointerSearcher
 {
     public partial class Form1 : Form
     {
-        Socket s;
+        private Socket s;
+        private MemoryUtils mem;
         private PointerInfo info;
         private int maxDepth;
         private int targetselect = 0;
@@ -39,9 +40,15 @@ namespace PointerSearcher
         private Rectangle dragBoxFromMouseDown;
         private object valueFromMouseDown;
 
+
+        //Memory Viewer
+        private UInt64 mvAddress = 0;
+        private List<byte> mvBytes = new List<byte>();
+
         public Form1()
         {
             InitializeComponent();
+
             int maxDepth = 4;
             int maxOffsetNum = 1;
             long maxOffsetAddress = 0x800;
@@ -59,6 +66,12 @@ namespace PointerSearcher
             dgvBookmarks.MouseDown += DgvBookmarks_MouseDown;
             dgvDumpTargets.DragOver += this.DgvDumpTargets_DragOver;
             dgvDumpTargets.DragDrop += this.DgvDumpTargets_DragDrop;
+
+            cbMVHex.CheckedChanged += delegate ( object s, EventArgs e ) { RefreshMemoryViewer(); };
+            rbMVb1.CheckedChanged += delegate ( object s, EventArgs e ) { RefreshMemoryViewer(); };
+            rbMVb2.CheckedChanged += delegate ( object s, EventArgs e ) { RefreshMemoryViewer(); };
+            rbMVb4.CheckedChanged += delegate ( object s, EventArgs e ) { RefreshMemoryViewer(); };
+            rbMVb8.CheckedChanged += delegate ( object s, EventArgs e ) { RefreshMemoryViewer(); };
         }
 
         private void DgvBookmarks_MouseMove( Object sender, MouseEventArgs e )
@@ -124,6 +137,7 @@ namespace PointerSearcher
             dgvDumpTargets[8, 4].Value = 5;
 
             s = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+            mem = new MemoryUtils( s );
             s.Close();
             ipBox.Text = ConfigurationManager.AppSettings["ipAddress"];
             pictureBox2.BringToFront();
@@ -732,6 +746,7 @@ namespace PointerSearcher
             }
 
             s = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+            mem = new MemoryUtils( s );
             IPEndPoint ep = new IPEndPoint( IPAddress.Parse( ipBox.Text ), 7331 );
             Configuration config = ConfigurationManager.OpenExeConfiguration( Application.ExecutablePath );
             if ( config.AppSettings.Settings["ipAddress"] == null )
@@ -1054,64 +1069,7 @@ namespace PointerSearcher
             s.Receive( b );
             return !showerror( b );
         }
-        private bool readmemblock(ref byte[] outbuf, long address, int size)
-        {
-            if ( !command_available() )
-            {
-                return false;
-            }
-            byte[] k = new byte[5];
-            int len;
-            int pos = 0;
-            byte[] inbuf;
-            int a = SendMessage( NoexsCommands.ReadMem );
-            a = SendData( BitConverter.GetBytes( address ) );
-            a = SendData( BitConverter.GetBytes( size ) );
-            if ( noerror() )
-            {
-                while (size >0)
-                {
-                    if ( noerror() )
-                    {
-                        while ( s.Available < 5 ) { }
-                        s.Receive( k );
-                        len = BitConverter.ToInt32( k, 1 );
-                        if (k[0] == 0) // no compression
-                        {
-                            inbuf = new byte[len];
-                            while ( s.Available < len ) { }
-                            s.Receive( inbuf );
-                            for ( int i = 0; i < len; i++ )
-                                outbuf[pos + i] = inbuf[i];
-                            pos += len;
-                            size -= len;
-                        }
-                        else
-                        {
-                            k = new byte[4];
-                            while ( s.Available < 4 ) { }
-                            s.Receive( k );
-                            int rlesize = BitConverter.ToInt32( k, 0 );
-                            inbuf = new byte[rlesize];
-                            while ( s.Available < rlesize ) { }
-                            s.Receive( inbuf );
-                            int urlesize = 0;
-                            for ( int i = 0; urlesize < len; i += 2 )
-                            {
-                                for ( int m = 0; m < inbuf[1]; m++ )
-                                    outbuf[pos + urlesize + m] = inbuf[i];
-                                urlesize += inbuf[i + 1];
-                            }
-                            pos += urlesize;
-                            size -= urlesize;
-                        }
-                    }
-                    
-                }
-                
-            }
-            return noerror();
-        } 
+
         private int SendMessage( NoexsCommands cmd )
         {
             return s.Send( new byte[] { (byte)cmd } );
@@ -1607,7 +1565,7 @@ namespace PointerSearcher
                          {
                              //for ( int j = 0; j < 18; j++ )
                              //    label[j] = dataset[i + j];
-                             var bkmLabel = System.Text.Encoding.UTF8.GetString( dataset, i,18);
+                             var bkmLabel = System.Text.Encoding.UTF8.GetString( dataset, i, 18 );
                              i += 18;
                              var bkmAddress = "0x" + BitConverter.ToInt64( dataset, i ).ToString( "X" );
                              dgvBookmarks.Rows.Add( new object[] { ++index, bkmAddress, bkmLabel } );
@@ -1676,6 +1634,7 @@ namespace PointerSearcher
                 return;
             }
             s = new Socket( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+            mem = new MemoryUtils( s );
             IPEndPoint ep = new IPEndPoint( IPAddress.Parse( ipBox.Text ), 7331 );
             Configuration config = ConfigurationManager.OpenExeConfiguration( Application.ExecutablePath );
             if ( config.AppSettings.Settings["ipAddress"] == null )
@@ -2080,13 +2039,75 @@ namespace PointerSearcher
         }
 
 
-        private void button11_Click_1( Object sender, EventArgs e )
+        private void button11_Click( Object sender, EventArgs e )
         {
-            long targetAddress = Convert.ToInt64( dgvDumpTargets.Rows[fileselect].Cells[5 + targetselect].Value.ToString(), 16 );
-            int size = Convert.ToInt32( dgvDumpTargets.Rows[fileselect].Cells[6 + targetselect].Value.ToString(), 16 );
-            byte[] outbuf = new byte[size];
-            readmemblock( ref outbuf, targetAddress, size );
-            int a = 1;
+            // [[[[[main+9BF5FD8]+20]]+78]+150]+D60 Blue Mushroom
+            // [[[[[main+9BF5FD8]+20]]+78]+150]+DA0 Blue Adamantine Shard
+
+            UInt64 main = Convert.ToUInt64( "0x25d1e04000", 16 );
+
+            var rs = mem.ReadU64( main, 0x9BF5FD8, true );
+            rs = mem.ReadU64( rs, 0x20, true );
+            rs = mem.ReadU64( rs, 0x0, true );
+            rs = mem.ReadU64( rs, 0x78, true );
+            rs = mem.ReadU64( rs, 0x150, true );
+            //mem.ReadS32( rs, 0xdA0, true );
+
+            mvBytes = mem.ReadByteArray( rs, 0, 0x1000 );
+            mvAddress = rs;
+
+            RefreshMemoryViewer();
+        }
+
+        void RefreshMemoryViewer()
+        {
+            var ba = mvBytes.ToList();
+            string sOut = "";
+            for ( int i = 0; i < ba.Count; i += 0x10 )
+            {
+                var q1 = BitConverter.ToUInt64( ba.GetRange( i, 0x10 ).ToArray(), 0x0 );
+                var q2 = BitConverter.ToUInt64( ba.GetRange( i, 0x10 ).ToArray(), 0x8 );
+
+                var d1 = BitConverter.ToUInt32( ba.GetRange( i, 0x10 ).ToArray(), 0x0 );
+                var d2 = BitConverter.ToUInt32( ba.GetRange( i, 0x10 ).ToArray(), 0x4 );
+                var d3 = BitConverter.ToUInt32( ba.GetRange( i, 0x10 ).ToArray(), 0x8 );
+                var d4 = BitConverter.ToUInt32( ba.GetRange( i, 0x10 ).ToArray(), 0xC );
+
+                var w1 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0x0 );
+                var w2 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0x2 );
+                var w3 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0x4 );
+                var w4 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0x6 );
+                var w5 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0x8 );
+                var w6 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0xA );
+                var w7 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0xC );
+                var w8 = BitConverter.ToUInt16( ba.GetRange( i, 0x10 ).ToArray(), 0xE );
+
+                //sOut += $"{rs + (UInt64)i:X} | {String.Format( "{0,10}", d1 )} {String.Format( "{0,10}", d2 )} {String.Format( "{0,10}", d3 )} {String.Format( "{0,10}", d4 )}";
+                //sOut += $"{rs + (UInt64)i:X} | {d1:X8} {d2:X8} {d3:X8} {d4:X8}";
+
+                if ( rbMVb8.Checked )
+                    sOut += $"{mvAddress + (UInt64)i:X} | {mvStr( q1 )} {mvStr( q2 )}";
+                else if ( rbMVb4.Checked )
+                    sOut += $"{mvAddress + (UInt64)i:X} | {mvStr( d1 )} {mvStr( d2 )} {mvStr( d3 )} {mvStr( d4 )}";
+                else
+                    sOut += $"{mvAddress + (UInt64)i:X} | {mvStr( w1 )} {mvStr( w2 )} {mvStr( w3 )} {mvStr( w4 )} {mvStr( w5 )} {mvStr( w6 )} {mvStr( w7 )} {mvStr( w8 )}";
+                
+                sOut += Environment.NewLine;
+            }
+
+            txtMemoryViewer.Text = sOut;
+        }
+
+        private string mvStr( object o )
+        {
+            if ( cbMVHex.Checked )
+            {
+                return rbMVb1.Checked ? $"{o:X2}" : rbMVb2.Checked ? $"{o:X4}" : rbMVb4.Checked ? $"{o:X8}" : rbMVb8.Checked ? $"{o:X16}" : "";
+            }
+            else
+            {
+                return rbMVb1.Checked ? String.Format("{0,3}", o) : rbMVb2.Checked ? String.Format( "{0,5}", o ) : rbMVb4.Checked ? String.Format( "{0,10}", o ) : rbMVb8.Checked ? String.Format( "{0,20}", o ) : "";
+            }
         }
     }
 }

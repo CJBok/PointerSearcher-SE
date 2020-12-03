@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
             this.buttonRead = new System.Windows.Forms.Button();
             this.txtPointerSearchResults = new System.Windows.Forms.TextBox();
             this.dgvDumpTargets = new System.Windows.Forms.DataGridView();
@@ -211,7 +211,15 @@
             this.button8 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.button10 = new System.Windows.Forms.Button();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
             this.button11 = new System.Windows.Forms.Button();
+            this.txtMemoryViewer = new System.Windows.Forms.TextBox();
+            this.gbMVSettings = new System.Windows.Forms.GroupBox();
+            this.rbMVb1 = new System.Windows.Forms.RadioButton();
+            this.rbMVb2 = new System.Windows.Forms.RadioButton();
+            this.rbMVb4 = new System.Windows.Forms.RadioButton();
+            this.rbMVb8 = new System.Windows.Forms.RadioButton();
+            this.cbMVHex = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDumpTargets)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -231,6 +239,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Search)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pointers_candidates)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            this.gbMVSettings.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonRead
@@ -245,6 +255,7 @@
             // 
             // txtPointerSearchResults
             // 
+            this.txtPointerSearchResults.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPointerSearchResults.Location = new System.Drawing.Point(6, 246);
             this.txtPointerSearchResults.Multiline = true;
             this.txtPointerSearchResults.Name = "txtPointerSearchResults";
@@ -278,8 +289,8 @@
             this.dgvDumpTargets.Name = "dgvDumpTargets";
             this.dgvDumpTargets.RowHeadersVisible = false;
             this.dgvDumpTargets.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle6.NullValue = null;
-            this.dgvDumpTargets.RowsDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle18.NullValue = null;
+            this.dgvDumpTargets.RowsDefaultCellStyle = dataGridViewCellStyle18;
             this.dgvDumpTargets.RowTemplate.Height = 21;
             this.dgvDumpTargets.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgvDumpTargets.Size = new System.Drawing.Size(1088, 163);
@@ -345,8 +356,8 @@
             // ColumnFileRow
             // 
             this.ColumnFileRow.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ColumnFileRow.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ColumnFileRow.DefaultCellStyle = dataGridViewCellStyle17;
             this.ColumnFileRow.HeaderText = "File";
             this.ColumnFileRow.MinimumWidth = 25;
             this.ColumnFileRow.Name = "ColumnFileRow";
@@ -691,6 +702,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -1036,17 +1048,17 @@
             // fromDataGridViewTextBoxColumn
             // 
             this.fromDataGridViewTextBoxColumn.DataPropertyName = "From";
-            dataGridViewCellStyle7.Format = "X10";
-            dataGridViewCellStyle7.NullValue = null;
-            this.fromDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle19.Format = "X10";
+            dataGridViewCellStyle19.NullValue = null;
+            this.fromDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle19;
             this.fromDataGridViewTextBoxColumn.HeaderText = "From";
             this.fromDataGridViewTextBoxColumn.Name = "fromDataGridViewTextBoxColumn";
             // 
             // toDataGridViewTextBoxColumn
             // 
             this.toDataGridViewTextBoxColumn.DataPropertyName = "To";
-            dataGridViewCellStyle8.Format = "X10";
-            this.toDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle20.Format = "X10";
+            this.toDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle20;
             this.toDataGridViewTextBoxColumn.HeaderText = "To";
             this.toDataGridViewTextBoxColumn.Name = "toDataGridViewTextBoxColumn";
             // 
@@ -1860,22 +1872,119 @@
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.gbMVSettings);
+            this.tabPage3.Controls.Add(this.txtMemoryViewer);
+            this.tabPage3.Controls.Add(this.button11);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(1100, 454);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Memory Viewer";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
             // button11
             // 
-            this.button11.Location = new System.Drawing.Point(646, 497);
+            this.button11.Location = new System.Drawing.Point(6, 6);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(210, 23);
-            this.button11.TabIndex = 102;
+            this.button11.TabIndex = 103;
             this.button11.Text = "test readmemblock";
             this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(this.button11_Click_1);
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            // 
+            // txtMemoryViewer
+            // 
+            this.txtMemoryViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtMemoryViewer.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtMemoryViewer.Location = new System.Drawing.Point(222, 6);
+            this.txtMemoryViewer.Multiline = true;
+            this.txtMemoryViewer.Name = "txtMemoryViewer";
+            this.txtMemoryViewer.ReadOnly = true;
+            this.txtMemoryViewer.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtMemoryViewer.Size = new System.Drawing.Size(872, 442);
+            this.txtMemoryViewer.TabIndex = 104;
+            // 
+            // gbMVSettings
+            // 
+            this.gbMVSettings.Controls.Add(this.cbMVHex);
+            this.gbMVSettings.Controls.Add(this.rbMVb8);
+            this.gbMVSettings.Controls.Add(this.rbMVb4);
+            this.gbMVSettings.Controls.Add(this.rbMVb2);
+            this.gbMVSettings.Controls.Add(this.rbMVb1);
+            this.gbMVSettings.Location = new System.Drawing.Point(6, 35);
+            this.gbMVSettings.Name = "gbMVSettings";
+            this.gbMVSettings.Size = new System.Drawing.Size(210, 130);
+            this.gbMVSettings.TabIndex = 105;
+            this.gbMVSettings.TabStop = false;
+            this.gbMVSettings.Text = "Settings";
+            // 
+            // rbMVb1
+            // 
+            this.rbMVb1.AutoSize = true;
+            this.rbMVb1.Location = new System.Drawing.Point(6, 19);
+            this.rbMVb1.Name = "rbMVb1";
+            this.rbMVb1.Size = new System.Drawing.Size(55, 17);
+            this.rbMVb1.TabIndex = 0;
+            this.rbMVb1.TabStop = true;
+            this.rbMVb1.Text = "1 Byte";
+            this.rbMVb1.UseVisualStyleBackColor = true;
+            // 
+            // rbMVb2
+            // 
+            this.rbMVb2.AutoSize = true;
+            this.rbMVb2.Checked = true;
+            this.rbMVb2.Location = new System.Drawing.Point(6, 42);
+            this.rbMVb2.Name = "rbMVb2";
+            this.rbMVb2.Size = new System.Drawing.Size(60, 17);
+            this.rbMVb2.TabIndex = 0;
+            this.rbMVb2.TabStop = true;
+            this.rbMVb2.Text = "2 Bytes";
+            this.rbMVb2.UseVisualStyleBackColor = true;
+            // 
+            // rbMVb4
+            // 
+            this.rbMVb4.AutoSize = true;
+            this.rbMVb4.Location = new System.Drawing.Point(6, 65);
+            this.rbMVb4.Name = "rbMVb4";
+            this.rbMVb4.Size = new System.Drawing.Size(60, 17);
+            this.rbMVb4.TabIndex = 0;
+            this.rbMVb4.Text = "4 Bytes";
+            this.rbMVb4.UseVisualStyleBackColor = true;
+            // 
+            // rbMVb8
+            // 
+            this.rbMVb8.AutoSize = true;
+            this.rbMVb8.Location = new System.Drawing.Point(6, 88);
+            this.rbMVb8.Name = "rbMVb8";
+            this.rbMVb8.Size = new System.Drawing.Size(60, 17);
+            this.rbMVb8.TabIndex = 0;
+            this.rbMVb8.TabStop = true;
+            this.rbMVb8.Text = "8 Bytes";
+            this.rbMVb8.UseVisualStyleBackColor = true;
+            // 
+            // cbMVHex
+            // 
+            this.cbMVHex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbMVHex.AutoSize = true;
+            this.cbMVHex.Checked = true;
+            this.cbMVHex.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbMVHex.Location = new System.Drawing.Point(159, 19);
+            this.cbMVHex.Name = "cbMVHex";
+            this.cbMVHex.Size = new System.Drawing.Size(45, 17);
+            this.cbMVHex.TabIndex = 1;
+            this.cbMVHex.Text = "Hex";
+            this.cbMVHex.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1114, 660);
-            this.Controls.Add(this.button11);
+            this.ClientSize = new System.Drawing.Size(1114, 525);
             this.Controls.Add(this.button10);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.label29);
@@ -1946,6 +2055,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Search)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pointers_candidates)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            this.gbMVSettings.ResumeLayout(false);
+            this.gbMVSettings.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2131,7 +2244,15 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn lblRow;
         private System.Windows.Forms.DataGridViewTextBoxColumn Address1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Label;
+        private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.Button button11;
+        private System.Windows.Forms.GroupBox gbMVSettings;
+        private System.Windows.Forms.CheckBox cbMVHex;
+        private System.Windows.Forms.RadioButton rbMVb8;
+        private System.Windows.Forms.RadioButton rbMVb4;
+        private System.Windows.Forms.RadioButton rbMVb2;
+        private System.Windows.Forms.RadioButton rbMVb1;
+        private System.Windows.Forms.TextBox txtMemoryViewer;
     }
 }
 
